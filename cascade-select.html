@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="AngularTestApp">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+</head>
+
+<body id="container" ng-controller="documentController as document">
+
+    <div class="container">
+        <div class="row mt-4">
+            <form name="create-item" class="col-md-12">
+                <div class="form-group">
+                    <label for="text">Job Type</label>
+                    <select name="jobType" id="jobType" class="form-control" ng-init="jobType = jobTypes[0].id" ng-options="obj.id as obj.name disable when (jobTypes.indexOf(obj) == 0) for obj in jobTypes"
+                        ng-model="jobType" ng-change="loadList('jobArea')">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="text">Job Area</label>
+                    <select name="jobArea" id="jobArea" class="form-control" ng-init="jobArea = jobAreas[0].id" ng-options="obj.id as obj.name disable when (jobAreas.indexOf(obj) == 0) for obj in jobAreas"
+                        ng-model="jobArea" ng-change="loadList('jobTitle')">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="text">Job Title</label>
+                    <select name="jobTitle" id="jobTitle" class="form-control" ng-init="jobTitle = jobTitles[0].id" ng-options="obj.id as obj.name disable when (jobTitles.indexOf(obj) == 0) for obj in jobTitles"
+                        ng-model="jobTitle">
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script>
+        var angularApp = angular.module('AngularTestApp', []).controller('documentController', function ($scope, $http,
+            $parse) {
+
+            $scope._jobTypes = [{
+                    id: "1",
+                    name: "Producer"
+                },
+                {
+                    id: "2",
+                    name: "Analyst"
+                },
+                {
+                    id: "3",
+                    name: "Consultant"
+                },
+                {
+                    id: "4",
+                    name: "Analyst"
+                }
+            ];
+
+            $scope._jobAreas = [{
+                    id: "1",
+                    name: "Infrastructure"
+                },
+                {
+                    id: "2",
+                    name: "Communications"
+                },
+                {
+                    id: "3",
+                    name: "Metrics"
+                },
+                {
+                    id: "4",
+                    name: "Accountability"
+                },
+                {
+                    id: "5",
+                    name: "Markets"
+                },
+                {
+                    id: "6",
+                    name: "Tactics"
+                }
+            ];
+
+            $scope._jobTitles = [{
+                    id: "1",
+                    name: "Central Group Facilitator"
+                },
+                {
+                    id: "2",
+                    name: "Central Applications Director"
+                },
+                {
+                    id: "3",
+                    name: "National Directives Producer"
+                },
+                {
+                    id: "4",
+                    name: "Human Configuration Producer"
+                }
+            ];
+
+            $scope.parameters = [{
+                    key: "jobType",
+                    defaults: {
+                        fill: "jobTypes",
+                        data: $scope._jobTypes
+                    }
+                },
+                {
+                    key: "jobArea",
+                    defaults: {
+                        fill: "jobAreas",
+                        data: $scope._jobAreas
+                    }
+                },
+                {
+                    key: "jobTitle",
+                    defaults: {
+                        fill: "jobTitles",
+                        data: $scope._jobTitles
+                    }
+                }
+            ];
+
+            $scope.jobTypes = [];
+
+            $scope.jobAreas = [];
+
+            $scope.jobTitles = [];
+
+            $scope.loadList = function (key) {
+
+                console.log("Loading...");
+
+                let parameters = $scope.parameters.find(param => param.key === key);
+
+                let loading = [{
+                    id: '?',
+                    name: 'Cargando...'
+                }];
+
+                $parse(parameters.defaults.fill).assign($scope, loading);
+                $parse(key).assign($scope, '?');
+
+                setTimeout(function () {
+                    let data = $scope.prepareList(parameters.defaults.data);
+                    $parse(parameters.defaults.fill).assign($scope, data);
+                }, 500);
+            };
+
+            $scope.prepareList = function (list) {
+
+                let result = [];
+
+                if (list.indexOf($scope.getDefaultOption()) == -1) {
+                    result.push($scope.getDefaultOption());
+                }
+
+                result = result.concat(list);
+
+                return result;
+            };
+
+            $scope.getDefaultOption = function () {
+                return {
+                    id: "?",
+                    name: "Favor de seleccionar"
+                };
+            };
+
+            $scope.initList = function (key) {
+                let parameters = $scope.parameters.find(param => param.key === key);
+                let list = [];
+                list.push($scope.getDefaultOption());
+                $parse(parameters.defaults.fill).assign($scope, list);
+            };
+
+            $scope.parameters.forEach(element => {
+                $scope.initList(element.key);
+            });
+
+            $scope.loadList('jobType');
+
+
+            /*
+                        $scope.loadList('jobType');
+                        $scope.loadList('jobArea');
+                        $scope.loadList('jobTitle');
+                        */
+
+
+        });
+    </script>
+</body>
+
+</html>

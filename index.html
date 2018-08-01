@@ -45,12 +45,17 @@
         var angularApp = angular.module('AngularTestApp', []).controller('documentController', function ($scope, $http,
             $parse) {
 
+            console.log("Angular loaded");
+
             $scope.messages = [{
                 id: 0,
                 text: "Primer mensaje"
             }];
 
             $scope.getMessage = function () {
+
+                console.log($("input[type=text]").val());
+
                 return {
                     id: $(".alert").length,
                     text: $("input[type=text]").val(),

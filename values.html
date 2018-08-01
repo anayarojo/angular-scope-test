@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="AngularTestApp">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+</head>
+
+<body id="container" ng-controller="documentController as document">
+
+    <div class="container">
+        <div class="row mt-4">
+            <form name="create-item" class="col-md-12">
+                <div class="form-group">
+                    <label for="text">Job Type</label>
+                    <select name="jobType" id="jobType" class="form-control" ng-init="jobType = jobTypes[0].id" ng-options="obj.id as obj.name disable when (jobTypes.indexOf(obj) == 0) for obj in jobTypes"
+                        ng-model="jobType" ng-change="getValue()">
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/jquery-3.3.1.slim.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+
+    <script>
+        var angularApp = angular.module('AngularTestApp', []).controller('documentController', function ($scope, $http,
+            $parse) {
+
+            $scope._jobTypes = [{
+                    id: "1",
+                    name: "Producer"
+                },
+                {
+                    id: "2",
+                    name: "Analyst"
+                },
+                {
+                    id: "3",
+                    name: "Consultant"
+                },
+                {
+                    id: "4",
+                    name: "Analyst"
+                }
+            ];
+
+            $scope.parameters = [{
+                key: "jobType",
+                defaults: {
+                    fill: "jobTypes",
+                    data: $scope._jobTypes
+                }
+            }];
+
+            $scope.jobTypes = [];
+
+
+            $scope.loadList = function (key) {
+
+                console.log("Loading...");
+
+                let parameters = $scope.parameters.find(param => param.key === key);
+
+                let loading = [{
+                    id: '?',
+                    name: 'Cargando...'
+                }];
+
+                $parse(parameters.defaults.fill).assign($scope, loading);
+                $parse(key).assign($scope, '?');
+
+                let data = $scope.prepareList(parameters.defaults.data);
+                $parse(parameters.defaults.fill).assign($scope, data);
+            };
+
+            $scope.prepareList = function (list) {
+
+                let result = [];
+
+                if (list.indexOf($scope.getDefaultOption()) == -1) {
+                    result.push($scope.getDefaultOption());
+                }
+
+                result = result.concat(list);
+
+                return result;
+            };
+
+            $scope.getDefaultOption = function () {
+                return {
+                    id: "?",
+                    name: "Favor de seleccionar"
+                };
+            };
+
+            $scope.getValue = function () {
+                let combo = $("select");
+                console.log(combo.val());
+            }
+
+            $scope.initList = function (key) {
+                let parameters = $scope.parameters.find(param => param.key === key);
+                let list = [];
+                list.push($scope.getDefaultOption());
+                $parse(parameters.defaults.fill).assign($scope, list);
+            };
+
+            $scope.parameters.forEach(element => {
+                $scope.initList(element.key);
+            });
+
+            $scope.loadList('jobType');
+
+        });
+    </script>
+</body>
+
+</html>
